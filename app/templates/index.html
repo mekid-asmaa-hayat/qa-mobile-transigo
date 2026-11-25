@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b5cad">
+<title>TransiGo — Mes titres de transport</title>
+<style>
+  :root { --bg:#f4f6fa; --card:#fff; --text:#1a1d24; --muted:#555d6b; --primary:#0b5cad; --primary-text:#fff; --danger:#b3261e; --ok:#1e7a3c; --border:#d5dae3; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#12151b; --card:#1d222b; --text:#eef1f6; --muted:#b4bccb; --primary:#5aa2ef; --primary-text:#0b1320; --danger:#ff8a80; --ok:#7fd99a; --border:#343b48; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--text); font-size:16px; }
+  header { background:var(--primary); color:var(--primary-text); padding:calc(env(safe-area-inset-top) + 14px) 16px 14px; display:flex; justify-content:space-between; align-items:center; }
+  header h1 { font-size:20px; margin:0; }
+  main { padding:16px 16px 96px; max-width:560px; margin:0 auto; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:12px; }
+  label { display:block; font-weight:600; margin:12px 0 6px; }
+  input { width:100%; padding:12px; font-size:16px; border:1px solid var(--border); border-radius:10px; background:var(--card); color:var(--text); }
+  .btn { display:block; width:100%; min-height:48px; border:0; border-radius:12px; background:var(--primary); color:var(--primary-text); font-size:17px; font-weight:700; margin-top:16px; cursor:pointer; }
+  .btn:disabled { opacity:.6; }
+  .btn.secondary { background:transparent; color:var(--primary); border:2px solid var(--primary); }
+  .row { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  .price { color:var(--muted); }
+  .qty { display:flex; align-items:center; gap:10px; }
+  .qty button { border:1px solid var(--border); background:var(--card); color:var(--text); border-radius:50%; display:flex; align-items:center; justify-content:center; padding:0; cursor:pointer; }
+  .qty button svg { width:18px; height:18px; }
+  .error { color:var(--danger); font-weight:600; margin-top:10px; }
+  .banner { background:#fff4d6; color:#5c4300; border-radius:10px; padding:10px 12px; margin-bottom:12px; font-weight:600; }
+  .success { color:var(--ok); font-weight:700; }
+  .ticket { display:flex; gap:14px; align-items:center; }
+  .ticket svg { flex:0 0 84px; height:84px; background:#fff; border-radius:6px; }
+  .total { font-size:20px; font-weight:800; }
+  nav.tabs { position:fixed; bottom:0; left:0; right:0; display:flex; background:var(--card); border-top:1px solid var(--border); padding-bottom:env(safe-area-inset-bottom); }
+  nav.tabs a { flex:1; text-align:center; padding:14px 4px; color:var(--muted); text-decoration:none; font-size:14px; min-height:48px; }
+  nav.tabs a.active { color:var(--primary); font-weight:700; }
+  .cart-table { width:100%; border-collapse:collapse; }
+  .cart-table td { padding:8px 4px; border-bottom:1px solid var(--border); }
+  .cart-table td.amount { text-align:right; white-space:nowrap; }
+  .hidden { display:none !important; }
+</style>
+<style>
+  /* Taille des zones tactiles des boutons de quantité */
+  .qty button { width: {{ '28px' if defects else '48px' }}; height: {{ '28px' if defects else '48px' }}; }
+</style>
+</head>
+<body>
+<header>
+  <h1>TransiGo</h1>
+  <span id="user-name" aria-live="polite"></span>
+</header>
+<main id="view" tabindex="-1"></main>
+<nav class="tabs hidden" id="tabs" aria-label="Navigation principale">
+  <a href="#/catalogue" data-tab="catalogue">Acheter</a>
+  <a href="#/panier" data-tab="panier">Panier <span id="cart-count"></span></a>
+  <a href="#/billets" data-tab="billets">Mes billets</a>
+  <a href="#/compte" data-tab="compte">Compte</a>
+</nav>
+
+<script>
+const DEFECTS = {{ 'true' if defects else 'false' }};
+const S = {
+  get token() { return localStorage.getItem('tg_token'); },
+  set token(v) { v ? localStorage.setItem('tg_token', v) : localStorage.removeItem('tg_token'); },
+  get user() { return JSON.parse(localStorage.getItem('tg_user') || 'null'); },
+  set user(v) { v ? localStorage.setItem('tg_user', JSON.stringify(v)) : localStorage.removeItem('tg_user'); },
+  cart: JSON.parse(localStorage.getItem('tg_cart') || '{}'),
+  saveCart() { localStorage.setItem('tg_cart', JSON.stringify(this.cart)); updateCartCount(); },
+};
+let CATALOGUE = [];
+const view = document.getElementById('view');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const euro = v => Number(v).toFixed(2).replace('.', ',') + ' €';
+
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (S.token) headers.Authorization = 'Bearer ' + S.token;
+  const res = await fetch(path, { ...opts, headers });
+  let body = null; try { body = await res.json(); } catch (e) {}
+  return { ok: res.ok, status: res.status, body };
+}
+
+function updateCartCount() {
+  const n = Object.values(S.cart).reduce((a, b) => a + b, 0);
+  document.getElementById('cart-count').textContent = n ? '(' + n + ')' : '';
+}
+
+function qrSvg(ref) {
+  let h = 0; for (const c of ref) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  let cells = '';
+  for (let y = 0; y < 21; y++) for (let x = 0; x < 21; x++) {
+    h = (h * 1103515245 + 12345) >>> 0;
+    const finder = (x < 7 && y < 7) || (x > 13 && y < 7) || (x < 7 && y > 13);
+    if (finder ? (x % 6 === 0 || y % 6 === 0 || (x % 7 > 1 && x % 7 < 5 && y % 7 > 1 && y % 7 < 5)) : (h >> 16) & 1)
+      cells += `<rect x="${x}" y="${y}" width="1" height="1"/>`;
+  }
+  return `<svg viewBox="-1 -1 23 23" role="img" aria-label="QR code du billet ${esc(ref)}"><g fill="#000">${cells}</g></svg>`;
+}
+
+// ---------------- Vues ----------------
+function viewLogin() {
+  view.innerHTML = `
+    <div class="card">
+      <h2>Connexion</h2>
+      <form id="login-form" novalidate>
+        <label for="email">Adresse e-mail</label>
+        <input id="email" type="email" autocomplete="username" inputmode="email" required>
+        <label for="password">Mot de passe</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+        <button class="btn" type="submit" id="login-btn">Se connecter</button>
+        <p class="error" id="login-error" role="alert"></p>
+      </form>
+    </div>`;
+  document.getElementById('login-form').onsubmit = async e => {
+    e.preventDefault();
+    const r = await api('/api/login', { method: 'POST', body: JSON.stringify({ email: email.value, password: password.value }) });
+    if (!r.ok) { document.getElementById('login-error').textContent = r.body?.error || 'Erreur'; return; }
+    S.token = r.body.token; S.user = { name: r.body.name, reduced: r.body.reduced, email: email.value.trim().toLowerCase() };
+    location.hash = '#/catalogue';
+  };
+}
+
+async function viewCatalogue() {
+  if (!CATALOGUE.length) { const r = await api('/api/catalogue'); CATALOGUE = r.body || []; }
+  view.innerHTML = `<h2>Acheter un titre</h2>` + CATALOGUE.map(p => {
+    const q = S.cart[p.id] || 0;
+    const minus = DEFECTS
+      ? `<button type="button" data-act="dec" data-id="${p.id}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" stroke-width="3"/></svg></button>`
+      : `<button type="button" data-act="dec" data-id="${p.id}" aria-label="Diminuer la quantité de ${esc(p.label)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" stroke-width="3"/></svg></button>`;
+    const plus = DEFECTS
+      ? `<button type="button" data-act="inc" data-id="${p.id}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="currentColor" stroke-width="3"/></svg></button>`
+      : `<button type="button" data-act="inc" data-id="${p.id}" aria-label="Augmenter la quantité de ${esc(p.label)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="currentColor" stroke-width="3"/></svg></button>`;
+    return `<div class="card product" data-id="${p.id}">
+      <div class="row"><div><strong>${esc(p.label)}</strong><div class="price">${euro(p.price)}${S.user?.reduced && p.reducible ? ' — tarif réduit -50 %' : ''}</div></div>
+      <div class="qty">${minus}<span class="q" aria-live="polite" data-testid="qty-${p.id}">${q}</span>${plus}</div></div></div>`;
+  }).join('') + `<a class="btn" href="#/panier" style="text-align:center;line-height:48px;text-decoration:none" id="go-cart">Voir le panier</a>`;
+  view.querySelectorAll('.qty button').forEach(b => b.onclick = () => {
+    const id = b.dataset.id; const q = S.cart[id] || 0;
+    S.cart[id] = b.dataset.act === 'inc' ? Math.min(q + 1, 20) : Math.max(q - 1, 0);
+    if (!S.cart[id]) delete S.cart[id];
+    S.saveCart(); b.parentElement.querySelector('.q').textContent = S.cart[id] || 0;
+  });
+}
+
+function cartItems() { return Object.entries(S.cart).map(([id, qty]) => ({ id, qty })); }
+
+async function viewPanier() {
+  const items = cartItems();
+  if (!items.length) { view.innerHTML = `<div class="card"><h2>Panier</h2><p>Votre panier est vide.</p><a href="#/catalogue">Acheter un titre</a></div>`; return; }
+  const r = await api('/api/quote', { method: 'POST', body: JSON.stringify({ items }) });
+  if (r.status === 401) return expireSession();
+  view.innerHTML = `<div class="card"><h2>Panier</h2>
+    <table class="cart-table"><tbody>${r.body.lines.map(l => `<tr><td>${l.qty} × ${esc(l.label)}</td><td class="amount" data-testid="line-${l.id}">${euro(l.amount)}</td></tr>`).join('')}</tbody></table>
+    <p class="row total"><span>Total</span><span data-testid="cart-total">${euro(r.body.total)}</span></p>
+    <a class="btn" href="#/paiement" id="go-pay" style="text-align:center;line-height:48px;text-decoration:none">Payer</a></div>`;
+}
+
+function viewPaiement() {
+  if (!cartItems().length) { location.hash = '#/panier'; return; }
+  const numberAttrs = DEFECTS ? 'type="text"' : 'type="text" inputmode="numeric" autocomplete="cc-number"';
+  view.innerHTML = `<div class="card"><h2>Paiement</h2>
+    <form id="pay-form" novalidate>
+      <label for="cc-number">Numéro de carte</label><input id="cc-number" ${numberAttrs} maxlength="19" placeholder="1234 5678 9012 3456">
+      <div class="row">
+        <div style="flex:1"><label for="cc-exp">Expiration (MM/AA)</label><input id="cc-exp" inputmode="numeric" autocomplete="cc-exp" maxlength="5" placeholder="MM/AA"></div>
+        <div style="flex:1"><label for="cc-cvv">Cryptogramme</label><input id="cc-cvv" inputmode="numeric" autocomplete="cc-csc" maxlength="3"></div>
+      </div>
+      <button class="btn" id="pay-btn" type="submit">Confirmer le paiement</button>
+      <p class="error" id="pay-error" role="alert"></p>
+    </form></div>`;
+  const form = document.getElementById('pay-form'); const btn = document.getElementById('pay-btn');
+  let idemKey = crypto.randomUUID ? crypto.randomUUID() : String(Math.random());
+  form.onsubmit = async e => {
+    e.preventDefault();
+    if (!DEFECTS) { if (btn.disabled) return; btn.disabled = true; }
+    const key = DEFECTS ? String(Math.random()) : idemKey;
+    const card = { number: document.getElementById('cc-number').value, expiry: document.getElementById('cc-exp').value, cvv: document.getElementById('cc-cvv').value };
+    const r = await api('/api/orders', { method: 'POST', body: JSON.stringify({ items: cartItems(), card, idempotency_key: key }) });
+    btn.disabled = false;
+    if (r.status === 401) return expireSession();
+    if (!r.ok) { document.getElementById('pay-error').textContent = r.body?.error || 'Paiement refusé'; return; }
+    S.cart = {}; S.saveCart();
+    sessionStorage.setItem('tg_last_order', r.body.id);
+    location.hash = '#/billets';
+  };
+}
+
+function renderTicketList(list, offline) {
+  const last = sessionStorage.getItem('tg_last_order');
+  view.innerHTML = (offline ? `<div class="banner" role="status" data-testid="offline-banner">Hors ligne — billets enregistrés sur ce téléphone</div>` : '')
+    + (last && !offline ? `<p class="success" role="status">Paiement accepté — commande ${esc(last)}</p>` : '')
+    + `<div class="row"><h2>Mes billets</h2><button class="btn secondary" style="width:auto;padding:0 16px;margin:0" id="refresh">Actualiser</button></div>`
+    + (list.length ? list.map(t => `<div class="card ticket" data-testid="ticket">${qrSvg(t.ref)}<div><strong>${esc(t.label)}</strong><div class="price">${esc(t.ref)}</div></div></div>`).join('')
+                   : `<div class="card">Aucun billet pour le moment.</div>`);
+  sessionStorage.removeItem('tg_last_order');
+  document.getElementById('refresh').onclick = viewBillets;
+}
+
+const cacheKey = () => 'tg_tickets_' + (S.user?.email || 'anon');
+
+async function viewBillets() {
+  if (!DEFECTS && !S.token) { location.hash = '#/login'; return; }
+  let r;
+  try {
+    r = await api('/api/tickets');
+  } catch (err) {
+    // Réseau indisponible
+    if (DEFECTS) { view.innerHTML = `<div class="card error" role="alert" data-testid="network-error">Erreur réseau. Réessayez plus tard.</div>`; return; } // [DEFECT BUG-002]
+    const cached = JSON.parse(localStorage.getItem(cacheKey()) || '[]');
+    return renderTicketList(cached, true);
+  }
+  if (!r.ok) {
+    if (DEFECTS) { // [DEFECT BUG-005] le fallback cache est branché sur la mauvaise branche
+      const cached = JSON.parse(localStorage.getItem(Object.keys(localStorage).find(k => k.startsWith('tg_tickets_')) || 'x') || '[]');
+      return renderTicketList(cached, false);
+    }
+    return expireSession();
+  }
+  localStorage.setItem(cacheKey(), JSON.stringify(r.body));
+  renderTicketList(r.body, false);
+}
+
+function viewCompte() {
+  view.innerHTML = `<div class="card"><h2>Mon compte</h2><p>${esc(S.user?.name || '')}</p><p class="price">${esc(S.user?.email || '')}</p>
+    <button class="btn secondary" id="logout">Se déconnecter</button></div>`;
+  document.getElementById('logout').onclick = async () => {
+    try { await api('/api/logout', { method: 'POST' }); } catch (e) {}
+    if (!DEFECTS) Object.keys(localStorage).filter(k => k.startsWith('tg_tickets_')).forEach(k => localStorage.removeItem(k));
+    S.token = null; S.user = null; S.cart = {}; S.saveCart();
+    location.hash = '#/login';
+  };
+}
+
+function expireSession() { S.token = null; S.user = null; location.hash = '#/login'; }
+
+const ROUTES = { login: viewLogin, catalogue: viewCatalogue, panier: viewPanier, paiement: viewPaiement, billets: viewBillets, compte: viewCompte };
+const PROTECTED = DEFECTS ? ['catalogue', 'panier', 'paiement', 'compte'] : ['catalogue', 'panier', 'paiement', 'billets', 'compte'];
+
+function router() {
+  let page = (location.hash.replace('#/', '') || 'login');
+  if (!ROUTES[page]) page = 'login';
+  if (PROTECTED.includes(page) && !S.token) { location.hash = '#/login'; return; }
+  if (page === 'login' && S.token) { location.hash = '#/catalogue'; return; }
+  document.getElementById('tabs').classList.toggle('hidden', page === 'login');
+  document.querySelectorAll('nav.tabs a').forEach(a => a.classList.toggle('active', a.dataset.tab === page));
+  document.getElementById('user-name').textContent = S.user?.name || '';
+  updateCartCount();
+  ROUTES[page]();
+}
+window.addEventListener('hashchange', router);
+router();
+</script>
+</body>
+</html>

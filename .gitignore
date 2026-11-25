@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+reports/captures/
+reports/ci-*
+.DS_Store

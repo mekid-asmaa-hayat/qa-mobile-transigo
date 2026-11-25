@@ -1,0 +1,51 @@
+name: QA mobile — recette TransiGo
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  non-regression:
+    name: Non-régression (version corrigée) — iOS WebKit + Android Chromium
+    runs-on: ubuntu-latest
+    env:
+      APP_DEFECTS: "off"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m playwright install --with-deps chromium webkit
+      - run: python -m pytest --junitxml=reports/ci-non-regression.xml
+      - if: always()
+        run: python tools/generate_report.py reports/ci-non-regression.xml reports/ci-rapport.md "CI — non-régression" "commit ${{ github.sha }}"
+      - if: always()
+        run: cat reports/ci-rapport.md >> "$GITHUB_STEP_SUMMARY"
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapport-non-regression
+          path: reports/
+
+  detection-defauts:
+    name: Démo — détection des défauts injectés (NO-GO attendu)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      APP_DEFECTS: "on"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python -m playwright install --with-deps chromium webkit
+      - run: python -m pytest --junitxml=reports/ci-defauts.xml || true
+      - run: python tools/generate_report.py reports/ci-defauts.xml reports/ci-rapport-defauts.md "CI — version avec défauts" "commit ${{ github.sha }}"
+      - run: cat reports/ci-rapport-defauts.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rapport-defauts-et-captures
+          path: reports/

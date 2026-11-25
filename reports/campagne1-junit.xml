@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="16" skipped="0" tests="46" time="56.532" timestamp="2026-11-25T11:08:24.566050+01:00" hostname="vm"><testcase classname="tests.test_accessibilite" name="test_ct18_accessibilite_catalogue[ios]" time="1.600"><failure message="AssertionError: button-name (critical) x6 : Buttons must have discernible text&#10;assert not ['button-name (critical) x6 : Buttons must have discernible text']">page = &lt;Page url='http://127.0.0.1:5057/#/catalogue'&gt;
+
+    def test_ct18_accessibilite_catalogue(page):
+        """CT-18 — US-02 : l'écran d'achat n'a aucune violation critique/sérieuse (ex. boutons sans nom pour VoiceOver/TalkBack)."""
+        login(page)
+        violations = blocking_violations(page)
+&gt;       assert not violations, "\n".join(violations)
+E       AssertionError: button-name (critical) x6 : Buttons must have discernible text
+E       assert not ['button-name (critical) x6 : Buttons must have discernible text']
+
+tests/test_accessibilite.py:24: AssertionError</failure></testcase><testcase classname="tests.test_accessibilite" name="test_ct18_accessibilite_catalogue[android]" time="0.729"><failure message="AssertionError: button-name (critical) x6 : Buttons must have discernible text&#10;assert not ['button-name (critical) x6 : Buttons must have discernible text']">page = &lt;Page url='http://127.0.0.1:5057/#/catalogue'&gt;
+
+    def test_ct18_accessibilite_catalogue(page):
+        """CT-18 — US-02 : l'écran d'achat n'a aucune violation critique/sérieuse (ex. boutons sans nom pour VoiceOver/TalkBack)."""
+        login(page)
+        violations = blocking_violations(page)
+&gt;       assert not violations, "\n".join(violations)
+E       AssertionError: button-name (critical) x6 : Buttons must have discernible text
+E       assert not ['button-name (critical) x6 : Buttons must have discernible text']
+
+tests/test_accessibilite.py:24: AssertionError</failure></testcase><testcase classname="tests.test_accessibilite" name="test_ct19_accessibilite_connexion_paiement_billets[ios]" time="1.248" /><testcase classname="tests.test_accessibilite" name="test_ct19_accessibilite_connexion_paiement_billets[android]" time="1.322" /><testcase classname="tests.test_accessibilite" name="test_ct20_accessibilite_mode_sombre[ios]" time="0.735" /><testcase classname="tests.test_accessibilite" name="test_ct20_accessibilite_mode_sombre[android]" time="0.862" /><testcase classname="tests.test_parcours_achat" name="test_ct01_connexion_valide[ios]" time="0.366" /><testcase classname="tests.test_parcours_achat" name="test_ct01_connexion_valide[android]" time="0.354" /><testcase classname="tests.test_parcours_achat" name="test_ct02_connexion_mot_de_passe_errone[ios]" time="0.325" /><testcase classname="tests.test_parcours_achat" name="test_ct02_connexion_mot_de_passe_errone[android]" time="0.322" /><testcase classname="tests.test_parcours_achat" name="test_ct03_quantites_et_compteur_panier[ios]" time="0.526" /><testcase classname="tests.test_parcours_achat" name="test_ct03_quantites_et_compteur_panier[android]" time="0.502" /><testcase classname="tests.test_parcours_achat" name="test_ct04_total_plein_tarif[ios]" time="0.530" /><testcase classname="tests.test_parcours_achat" name="test_ct04_total_plein_tarif[android]" time="0.594" /><testcase classname="tests.test_parcours_achat" name="test_ct05_tarif_reduit_quantite_1[ios]" time="0.467" /><testcase classname="tests.test_parcours_achat" name="test_ct05_tarif_reduit_quantite_1[android]" time="0.459" /><testcase classname="tests.test_parcours_achat" name="test_ct06_tarif_reduit_quantite_multiple[ios]" time="0.670"><failure message="AssertionError: Total affiché : 5,25 €&#10;assert '5,25 €' == '3,15 €'&#10;  &#10;  - 3,15 €&#10;  + 5,25 €">page = &lt;Page url='http://127.0.0.1:5057/#/panier'&gt;
+
+    def test_ct06_tarif_reduit_quantite_multiple(page):
+        """CT-06 — US-03 : Bob 3 tickets -&gt; la réduction s'applique à CHAQUE ticket : 3 x 1,05 = 3,15 €."""
+        login(page, BOB)
+        add_to_cart(page, "T1", 3)
+        open_cart(page)
+&gt;       assert cart_total(page) == "3,15 €", f"Total affiché : {cart_total(page)}"
+E       AssertionError: Total affiché : 5,25 €
+E       assert '5,25 €' == '3,15 €'
+E         
+E         - 3,15 €
+E         + 5,25 €
+
+tests/test_parcours_achat.py:60: AssertionError</failure></testcase><testcase classname="tests.test_parcours_achat" name="test_ct06_tarif_reduit_quantite_multiple[android]" time="0.615"><failure message="AssertionError: Total affiché : 5,25 €&#10;assert '5,25 €' == '3,15 €'&#10;  &#10;  - 3,15 €&#10;  + 5,25 €">page = &lt;Page url='http://127.0.0.1:5057/#/panier'&gt;
+
+    def test_ct06_tarif_reduit_quantite_multiple(page):
+        """CT-06 — US-03 : Bob 3 tickets -&gt; la réduction s'applique à CHAQUE ticket : 3 x 1,05 = 3,15 €."""
+        login(page, BOB)
+        add_to_cart(page, "T1", 3)
+        open_cart(page)
+&gt;       assert cart_total(page) == "3,15 €", f"Total affiché : {cart_total(page)}"
+E       AssertionError: Total affiché : 5,25 €
+E       assert '5,25 €' == '3,15 €'
+E         
+E         - 3,15 €
+E         + 5,25 €
+
+tests/test_parcours_achat.py:60: AssertionError</failure></testcase><testcase classname="tests.test_parcours_achat" name="test_ct07_pass_journee_non_reductible[ios]" time="0.463" /><testcase classname="tests.test_parcours_achat" name="test_ct07_pass_journee_non_reductible[android]" time="0.469" /><testcase classname="tests.test_parcours_achat" name="test_ct08_paiement_nominal_billets_emis[ios]" time="0.694" /><testcase classname="tests.test_parcours_achat" name="test_ct08_paiement_nominal_billets_emis[android]" time="0.694" /><testcase classname="tests.test_parcours_achat" name="test_ct09_carte_numero_invalide[ios]" time="0.624" /><testcase classname="tests.test_parcours_achat" name="test_ct09_carte_numero_invalide[android]" time="0.681" /><testcase classname="tests.test_parcours_achat" name="test_ct10_carte_expiree[ios]" time="1.213"><failure message="AssertionError: 1 commande(s) créée(s) avec une carte expirée&#10;assert [{'id': 'CMD-... '2.10', ...}] == []&#10;  &#10;  Left contains one more item: {'id': 'CMD-00001', 'lines': [{'amount': '2.10', 'id': 'T1', 'label': 'Ticket unitaire', 'qty': 1}], 'tickets': [{'label': 'Ticket unitaire', 'ref': 'CMD-00001-T1-1'}], 'total': '2.10', ...}&#10;  Use -v to get more diff">page = &lt;Page url='http://127.0.0.1:5057/#/billets'&gt;
+server = 'http://127.0.0.1:5057'
+
+    def test_ct10_carte_expiree(page, server):
+        """CT-10 — US-04 : carte expirée (01/24) -&gt; paiement refusé, aucune commande créée."""
+        login(page)
+        add_to_cart(page, "T1", 1)
+        open_cart(page)
+        fill_card(page, CARD_EXPIRED)
+        page.locator("#pay-btn").tap()
+        page.wait_for_timeout(500)
+        orders = requests.get(f"{server}/test/orders").json()
+&gt;       assert orders == [], f"{len(orders)} commande(s) créée(s) avec une carte expirée"
+E       AssertionError: 1 commande(s) créée(s) avec une carte expirée
+E       assert [{'id': 'CMD-... '2.10', ...}] == []
+E         
+E         Left contains one more item: {'id': 'CMD-00001', 'lines': [{'amount': '2.10', 'id': 'T1', 'label': 'Ticket unitaire', 'qty': 1}], 'tickets': [{'label': 'Ticket unitaire', 'ref': 'CMD-00001-T1-1'}], 'total': '2.10', ...}
+E         Use -v to get more diff
+
+tests/test_parcours_achat.py:99: AssertionError</failure></testcase><testcase classname="tests.test_parcours_achat" name="test_ct10_carte_expiree[android]" time="1.213"><failure message="AssertionError: 1 commande(s) créée(s) avec une carte expirée&#10;assert [{'id': 'CMD-... '2.10', ...}] == []&#10;  &#10;  Left contains one more item: {'id': 'CMD-00001', 'lines': [{'amount': '2.10', 'id': 'T1', 'label': 'Ticket unitaire', 'qty': 1}], 'tickets': [{'label': 'Ticket unitaire', 'ref': 'CMD-00001-T1-1'}], 'total': '2.10', ...}&#10;  Use -v to get more diff">page = &lt;Page url='http://127.0.0.1:5057/#/billets'&gt;
+server = 'http://127.0.0.1:5057'
+
+    def test_ct10_carte_expiree(page, server):
+        """CT-10 — US-04 : carte expirée (01/24) -&gt; paiement refusé, aucune commande créée."""
+        login(page)
+        add_to_cart(page, "T1", 1)
+        open_cart(page)
+        fill_card(page, CARD_EXPIRED)
+        page.locator("#pay-btn").tap()
+        page.wait_for_timeout(500)
+        orders = requests.get(f"{server}/test/orders").json()
+&gt;       assert orders == [], f"{len(orders)} commande(s) créée(s) avec une carte expirée"
+E       AssertionError: 1 commande(s) créée(s) avec une carte expirée
+E       assert [{'id': 'CMD-... '2.10', ...}] == []
+E         
+E         Left contains one more item: {'id': 'CMD-00001', 'lines': [{'amount': '2.10', 'id': 'T1', 'label': 'Ticket unitaire', 'qty': 1}], 'tickets': [{'label': 'Ticket unitaire', 'ref': 'CMD-00001-T1-1'}], 'total': '2.10', ...}
+E         Use -v to get more diff
+
+tests/test_parcours_achat.py:99: AssertionError</failure></testcase><testcase classname="tests.test_parcours_achat" name="test_ct11_cryptogramme_invalide[ios]" time="0.691" /><testcase classname="tests.test_parcours_achat" name="test_ct11_cryptogramme_invalide[android]" time="0.695" /><testcase classname="tests.test_parcours_achat" name="test_ct12_double_tap_paiement[ios]" time="2.186"><failure message="AssertionError: 2 commandes créées pour un seul achat&#10;assert 2 == 1&#10; +  where 2 = len([{'id': 'CMD-00001', 'lines': [{'amount': '2.10', 'id': 'T1', 'label': 'Ticket unitaire', 'qty': 1}], 'tickets': [{'la...icket unitaire', 'qty': 1}], 'tickets': [{'label': 'Ticket unitaire', 'ref': 'CMD-00002-T1-1'}], 'total': '2.10', ...}])">page = &lt;Page url='http://127.0.0.1:5057/#/billets'&gt;
+server = 'http://127.0.0.1:5057'
+
+    def test_ct12_double_tap_paiement(page, server):
+        """CT-12 — US-04 : un double tap sur « Confirmer » ne doit créer qu'UNE commande (pas de double débit)."""
+        login(page)
+        add_to_cart(page, "T1", 1)
+        open_cart(page)
+        fill_card(page, CARD_OK)
+        page.evaluate("() =&gt; { const b = document.getElementById('pay-btn'); b.click(); b.click(); }")
+        page.wait_for_timeout(1500)
+        orders = requests.get(f"{server}/test/orders").json()
+&gt;       assert len(orders) == 1, f"{len(orders)} commandes créées pour un seul achat"
+E       AssertionError: 2 commandes créées pour un seul achat
+E       assert 2 == 1
+E        +  where 2 = len([{'id': 'CMD-00001', 'lines': [{'amount': '2.10', 'id': 'T1', 'label': 'Ticket unitaire', 'qty': 1}], 'tickets': [{'la...icket unitaire', 'qty': 1}], 'tickets': [{'label': 'Ticket unitaire', 'ref': 'CMD-00002-T1-1'}], 'total': '2.10', ...}])
+
+tests/test_parcours_achat.py:122: AssertionError</failure></testcase><testcase classname="tests.test_parcours_achat" name="test_ct12_double_tap_paiement[android]" time="2.126"><failure message="AssertionError: 2 commandes créées pour un seul achat&#10;assert 2 == 1&#10; +  where 2 = len([{'id': 'CMD-00001', 'lines': [{'amount': '2.10', 'id': 'T1', 'label': 'Ticket unitaire', 'qty': 1}], 'tickets': [{'la...icket unitaire', 'qty': 1}], 'tickets': [{'label': 'Ticket unitaire', 'ref': 'CMD-00002-T1-1'}], 'total': '2.10', ...}])">page = &lt;Page url='http://127.0.0.1:5057/#/billets'&gt;
+server = 'http://127.0.0.1:5057'
+
+    def test_ct12_double_tap_paiement(page, server):
+        """CT-12 — US-04 : un double tap sur « Confirmer » ne doit créer qu'UNE commande (pas de double débit)."""
+        login(page)
+        add_to_cart(page, "T1", 1)
+        open_cart(page)
+        fill_card(page, CARD_OK)
+        page.evaluate("() =&gt; { const b = document.getElementById('pay-btn'); b.click(); b.click(); }")
+        page.wait_for_timeout(1500)
+        orders = requests.get(f"{server}/test/orders").json()
+&gt;       assert len(orders) == 1, f"{len(orders)} commandes créées pour un seul achat"
+E       AssertionError: 2 commandes créées pour un seul achat
+E       assert 2 == 1
+E        +  where 2 = len([{'id': 'CMD-00001', 'lines': [{'amount': '2.10', 'id': 'T1', 'label': 'Ticket unitaire', 'qty': 1}], 'tickets': [{'la...icket unitaire', 'qty': 1}], 'tickets': [{'label': 'Ticket unitaire', 'ref': 'CMD-00002-T1-1'}], 'total': '2.10', ...}])
+
+tests/test_parcours_achat.py:122: AssertionError</failure></testcase><testcase classname="tests.test_specificites_mobile" name="test_ct13_billets_consultables_hors_ligne[ios]" time="5.792"><failure message="AssertionError: Locator expected to be visible&#10;Actual value: None&#10;Error: element(s) not found &#10;Call log:&#10;  - Expect &quot;to_be_visible&quot; get_by_test_id(&quot;offline-banner&quot;) with timeout 5000ms&#10;  - waiting for get_by_test_id(&quot;offline-banner&quot;)&#10;&#10;Aria snapshot:&#10;- banner:&#10;  - heading &quot;TransiGo&quot; [level=1]&#10;  - text: Alice Martin&#10;- main:&#10;  - alert: Erreur réseau. Réessayez plus tard.&#10;- navigation &quot;Navigation principale&quot;:&#10;  - link &quot;Acheter&quot;:&#10;    - /url: &quot;#/catalogue&quot;&#10;  - link &quot;Panier&quot;:&#10;    - /url: &quot;#/panier&quot;&#10;  - link &quot;Mes billets&quot;:&#10;    - /url: &quot;#/billets&quot;&#10;  - link &quot;Compte&quot;:&#10;    - /url: &quot;#/compte&quot;">page = &lt;Page url='http://127.0.0.1:5057/#/billets'&gt;
+
+    def test_ct13_billets_consultables_hors_ligne(page):
+        """CT-13 — US-05 : en zone blanche (métro), les billets déjà achetés restent affichables."""
+        login(page)
+        buy(page, {"T1": 1})
+        expect(page.get_by_test_id("ticket")).to_have_count(1)
+        page.context.set_offline(True)
+        page.locator("#refresh").tap()
+&gt;       expect(page.get_by_test_id("offline-banner")).to_be_visible()
+E       AssertionError: Locator expected to be visible
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_be_visible" get_by_test_id("offline-banner") with timeout 5000ms
+E         - waiting for get_by_test_id("offline-banner")
+E       
+E       Aria snapshot:
+E       - banner:
+E         - heading "TransiGo" [level=1]
+E         - text: Alice Martin
+E       - main:
+E         - alert: Erreur réseau. Réessayez plus tard.
+E       - navigation "Navigation principale":
+E         - link "Acheter":
+E           - /url: "#/catalogue"
+E         - link "Panier":
+E           - /url: "#/panier"
+E         - link "Mes billets":
+E           - /url: "#/billets"
+E         - link "Compte":
+E           - /url: "#/compte"
+
+tests/test_specificites_mobile.py:18: AssertionError</failure></testcase><testcase classname="tests.test_specificites_mobile" name="test_ct13_billets_consultables_hors_ligne[android]" time="5.797"><failure message="AssertionError: Locator expected to be visible&#10;Actual value: None&#10;Error: element(s) not found &#10;Call log:&#10;  - Expect &quot;to_be_visible&quot; get_by_test_id(&quot;offline-banner&quot;) with timeout 5000ms&#10;  - waiting for get_by_test_id(&quot;offline-banner&quot;)&#10;&#10;Aria snapshot:&#10;- banner:&#10;  - heading &quot;TransiGo&quot; [level=1]&#10;  - text: Alice Martin&#10;- main:&#10;  - alert: Erreur réseau. Réessayez plus tard.&#10;- navigation &quot;Navigation principale&quot;:&#10;  - link &quot;Acheter&quot;:&#10;    - /url: &quot;#/catalogue&quot;&#10;  - link &quot;Panier&quot;:&#10;    - /url: &quot;#/panier&quot;&#10;  - link &quot;Mes billets&quot;:&#10;    - /url: &quot;#/billets&quot;&#10;  - link &quot;Compte&quot;:&#10;    - /url: &quot;#/compte&quot;">page = &lt;Page url='http://127.0.0.1:5057/#/billets'&gt;
+
+    def test_ct13_billets_consultables_hors_ligne(page):
+        """CT-13 — US-05 : en zone blanche (métro), les billets déjà achetés restent affichables."""
+        login(page)
+        buy(page, {"T1": 1})
+        expect(page.get_by_test_id("ticket")).to_have_count(1)
+        page.context.set_offline(True)
+        page.locator("#refresh").tap()
+&gt;       expect(page.get_by_test_id("offline-banner")).to_be_visible()
+E       AssertionError: Locator expected to be visible
+E       Actual value: None
+E       Error: element(s) not found 
+E       Call log:
+E         - Expect "to_be_visible" get_by_test_id("offline-banner") with timeout 5000ms
+E         - waiting for get_by_test_id("offline-banner")
+E       
+E       Aria snapshot:
+E       - banner:
+E         - heading "TransiGo" [level=1]
+E         - text: Alice Martin
+E       - main:
+E         - alert: Erreur réseau. Réessayez plus tard.
+E       - navigation "Navigation principale":
+E         - link "Acheter":
+E           - /url: "#/catalogue"
+E         - link "Panier":
+E           - /url: "#/panier"
+E         - link "Mes billets":
+E           - /url: "#/billets"
+E         - link "Compte":
+E           - /url: "#/compte"
+
+tests/test_specificites_mobile.py:18: AssertionError</failure></testcase><testcase classname="tests.test_specificites_mobile" name="test_ct14_deconnexion_protege_les_billets[ios]" time="6.282"><failure message="AssertionError: Locator expected to have count '0'&#10;Actual value: 2 &#10;Call log:&#10;  - Expect &quot;to_have_count&quot; get_by_test_id(&quot;ticket&quot;) with timeout 5000ms&#10;  - waiting for get_by_test_id(&quot;ticket&quot;)&#10;    14 × locator resolved to 2 elements&#10;       - unexpected value &quot;2&quot;">page = &lt;Page url='http://127.0.0.1:5057/#/billets'&gt;
+
+    def test_ct14_deconnexion_protege_les_billets(page):
+        """CT-14 — US-06 : après déconnexion, plus aucun billet n'est visible (téléphone prêté/partagé)."""
+        login(page)
+        buy(page, {"T1": 2})
+        expect(page.get_by_test_id("ticket")).to_have_count(2)
+        page.locator('nav.tabs a[data-tab="compte"]').tap()
+        page.locator("#logout").tap()
+        expect(page.locator("#login-form")).to_be_visible()
+        go(page, "billets")
+&gt;       expect(page.get_by_test_id("ticket")).to_have_count(0)
+E       AssertionError: Locator expected to have count '0'
+E       Actual value: 2 
+E       Call log:
+E         - Expect "to_have_count" get_by_test_id("ticket") with timeout 5000ms
+E         - waiting for get_by_test_id("ticket")
+E           14 × locator resolved to 2 elements
+E              - unexpected value "2"
+
+tests/test_specificites_mobile.py:31: AssertionError</failure></testcase><testcase classname="tests.test_specificites_mobile" name="test_ct14_deconnexion_protege_les_billets[android]" time="6.290"><failure message="AssertionError: Locator expected to have count '0'&#10;Actual value: 2 &#10;Call log:&#10;  - Expect &quot;to_have_count&quot; get_by_test_id(&quot;ticket&quot;) with timeout 5000ms&#10;  - waiting for get_by_test_id(&quot;ticket&quot;)&#10;    14 × locator resolved to 2 elements&#10;       - unexpected value &quot;2&quot;">page = &lt;Page url='http://127.0.0.1:5057/#/billets'&gt;
+
+    def test_ct14_deconnexion_protege_les_billets(page):
+        """CT-14 — US-06 : après déconnexion, plus aucun billet n'est visible (téléphone prêté/partagé)."""
+        login(page)
+        buy(page, {"T1": 2})
+        expect(page.get_by_test_id("ticket")).to_have_count(2)
+        page.locator('nav.tabs a[data-tab="compte"]').tap()
+        page.locator("#logout").tap()
+        expect(page.locator("#login-form")).to_be_visible()
+        go(page, "billets")
+&gt;       expect(page.get_by_test_id("ticket")).to_have_count(0)
+E       AssertionError: Locator expected to have count '0'
+E       Actual value: 2 
+E       Call log:
+E         - Expect "to_have_count" get_by_test_id("ticket") with timeout 5000ms
+E         - waiting for get_by_test_id("ticket")
+E           14 × locator resolved to 2 elements
+E              - unexpected value "2"
+
+tests/test_specificites_mobile.py:31: AssertionError</failure></testcase><testcase classname="tests.test_specificites_mobile" name="test_ct15_session_expiree[ios]" time="0.494" /><testcase classname="tests.test_specificites_mobile" name="test_ct15_session_expiree[android]" time="0.502" /><testcase classname="tests.test_specificites_mobile" name="test_ct16_clavier_numerique_carte[ios]" time="0.650"><failure message="AssertionError: Clavier alphabétique proposé pour un numéro de carte&#10;assert None == 'numeric'&#10; +  where None = get_attribute('inputmode')&#10; +    where get_attribute = &lt;Locator frame=&lt;Frame name= url='http://127.0.0.1:5057/#/paiement'&gt; selector='#cc-number'&gt;.get_attribute">page = &lt;Page url='http://127.0.0.1:5057/#/paiement'&gt;
+
+    def test_ct16_clavier_numerique_carte(page):
+        """CT-16 — US-04 : le champ numéro de carte ouvre le pavé numérique (inputmode) et propose l'autoremplissage."""
+        login(page)
+        add_to_cart(page, "T1", 1)
+        open_cart(page)
+        page.locator("#go-pay").tap()
+        field = page.locator("#cc-number")
+&gt;       assert field.get_attribute("inputmode") == "numeric", "Clavier alphabétique proposé pour un numéro de carte"
+E       AssertionError: Clavier alphabétique proposé pour un numéro de carte
+E       assert None == 'numeric'
+E        +  where None = get_attribute('inputmode')
+E        +    where get_attribute = &lt;Locator frame=&lt;Frame name= url='http://127.0.0.1:5057/#/paiement'&gt; selector='#cc-number'&gt;.get_attribute
+
+tests/test_specificites_mobile.py:51: AssertionError</failure></testcase><testcase classname="tests.test_specificites_mobile" name="test_ct16_clavier_numerique_carte[android]" time="0.653"><failure message="AssertionError: Clavier alphabétique proposé pour un numéro de carte&#10;assert None == 'numeric'&#10; +  where None = get_attribute('inputmode')&#10; +    where get_attribute = &lt;Locator frame=&lt;Frame name= url='http://127.0.0.1:5057/#/paiement'&gt; selector='#cc-number'&gt;.get_attribute">page = &lt;Page url='http://127.0.0.1:5057/#/paiement'&gt;
+
+    def test_ct16_clavier_numerique_carte(page):
+        """CT-16 — US-04 : le champ numéro de carte ouvre le pavé numérique (inputmode) et propose l'autoremplissage."""
+        login(page)
+        add_to_cart(page, "T1", 1)
+        open_cart(page)
+        page.locator("#go-pay").tap()
+        field = page.locator("#cc-number")
+&gt;       assert field.get_attribute("inputmode") == "numeric", "Clavier alphabétique proposé pour un numéro de carte"
+E       AssertionError: Clavier alphabétique proposé pour un numéro de carte
+E       assert None == 'numeric'
+E        +  where None = get_attribute('inputmode')
+E        +    where get_attribute = &lt;Locator frame=&lt;Frame name= url='http://127.0.0.1:5057/#/paiement'&gt; selector='#cc-number'&gt;.get_attribute
+
+tests/test_specificites_mobile.py:51: AssertionError</failure></testcase><testcase classname="tests.test_specificites_mobile" name="test_ct17_zones_tactiles[ios]" time="0.559"><failure message="AssertionError: Zones tactiles &lt; 44px : ['dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28']&#10;assert not ['dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28']">page = &lt;Page url='http://127.0.0.1:5057/#/catalogue'&gt;, min_touch = 44
+
+    def test_ct17_zones_tactiles(page, min_touch):
+        """CT-17 — Ergonomie : zones tactiles &gt;= 44 pt (Apple HIG) / 48 dp (Material Design)."""
+        login(page)
+        too_small = []
+        for btn in page.locator("main button, nav.tabs a").all():
+            box = btn.bounding_box()
+            if box and (box["width"] &lt; min_touch or box["height"] &lt; min_touch):
+                too_small.append(f"{btn.get_attribute('data-act') or btn.inner_text()} {box['width']:.0f}x{box['height']:.0f}")
+&gt;       assert not too_small, f"Zones tactiles &lt; {min_touch}px : {too_small}"
+E       AssertionError: Zones tactiles &lt; 44px : ['dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28']
+E       assert not ['dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28']
+
+tests/test_specificites_mobile.py:63: AssertionError</failure></testcase><testcase classname="tests.test_specificites_mobile" name="test_ct17_zones_tactiles[android]" time="0.573"><failure message="AssertionError: Zones tactiles &lt; 48px : ['dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28']&#10;assert not ['dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28']">page = &lt;Page url='http://127.0.0.1:5057/#/catalogue'&gt;, min_touch = 48
+
+    def test_ct17_zones_tactiles(page, min_touch):
+        """CT-17 — Ergonomie : zones tactiles &gt;= 44 pt (Apple HIG) / 48 dp (Material Design)."""
+        login(page)
+        too_small = []
+        for btn in page.locator("main button, nav.tabs a").all():
+            box = btn.bounding_box()
+            if box and (box["width"] &lt; min_touch or box["height"] &lt; min_touch):
+                too_small.append(f"{btn.get_attribute('data-act') or btn.inner_text()} {box['width']:.0f}x{box['height']:.0f}")
+&gt;       assert not too_small, f"Zones tactiles &lt; {min_touch}px : {too_small}"
+E       AssertionError: Zones tactiles &lt; 48px : ['dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28']
+E       assert not ['dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28', 'dec 28x28', 'inc 28x28']
+
+tests/test_specificites_mobile.py:63: AssertionError</failure></testcase><testcase classname="tests.test_specificites_mobile" name="test_ct21_orientation_paysage[ios]" time="0.566" /><testcase classname="tests.test_specificites_mobile" name="test_ct21_orientation_paysage[android]" time="0.552" /><testcase classname="tests.test_specificites_mobile" name="test_ct22_petit_ecran_320px[ios]" time="0.809" /><testcase classname="tests.test_specificites_mobile" name="test_ct22_petit_ecran_320px[android]" time="0.757" /><testcase classname="tests.test_specificites_mobile" name="test_ct23_isolation_donnees_utilisateurs[ios]" time="1.031" /><testcase classname="tests.test_specificites_mobile" name="test_ct23_isolation_donnees_utilisateurs[android]" time="1.102" /></testsuite></testsuites>
